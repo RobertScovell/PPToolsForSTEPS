@@ -73,11 +73,18 @@ nLevels = int(np.floor(max(np.log2(ny),np.log2(nx))))
 # This might help to resolve singularity spectrum in some cases (possibly due to presence of negative Holder exponents).
 noise=fracInt.fractionalIntegration(noise,-0.5)
 
-# Use rotationally-invariant transform. No inversion is required and need to ensure that maximum modulus over orientations is meaningful.
-transform = dtcwt.Transform2d(biort='near_sym_b_bp', qshift='qshift_b_bp')
+# Do not use rotationally-invariant transform. Adantage is much shorter filters. Disadvantage is that maximum mod over orientations may not be meaningful?
+# Use length 10 'a' filters here, rather than the length 14 'b'. 
+transform = dtcwt.Transform2d(biort='near_sym_a', qshift='qshift_a')
 dataT = transform.forward(noise,nlevels=nLevels)
-lvl1Filters=dtcwt.coeffs.biort('near_sym_b_bp')
-lvl2Filters=dtcwt.coeffs.qshift('qshift_b_bp')
+lvl1Filters=dtcwt.coeffs.biort('near_sym_a')
+lvl2Filters=dtcwt.coeffs.qshift('qshift_a')
+
+## Use rotationally-invariant transform. No inversion is required and need to ensure that maximum modulus over orientations is meaningful.
+#transform = dtcwt.Transform2d(biort='near_sym_b_bp', qshift='qshift_b_bp')
+#dataT = transform.forward(noise,nlevels=nLevels)
+#lvl1Filters=dtcwt.coeffs.biort('near_sym_b_bp')
+#lvl2Filters=dtcwt.coeffs.qshift('qshift_b_bp')
 
 # Routine to calculate effective filters at required level. Used to calculate length of filter.
 def iterConvFilters(h0a,h1a,level,dloFirst=None):
