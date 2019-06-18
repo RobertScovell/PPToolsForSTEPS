@@ -1,6 +1,6 @@
 #!/usr/bin/env python2.7
-
 # -*- coding: utf-8 -*-
+
 # -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2017-2019 Met Office.
 # All rights reserved.
@@ -74,7 +74,7 @@ nLevels = int(np.floor(max(np.log2(ny),np.log2(nx))))
 noise=fracInt.fractionalIntegration(noise,-0.5)
 
 # Do not use rotationally-invariant transform. Adantage is much shorter filters. Disadvantage is that maximum mod over orientations may not be meaningful?
-# Use length 10 'a' filters here, rather than the length 14 'b'. 
+# Use length 10 'a' filters here, rather than the length 14 'b' (or length 18 'b_bp'). 
 transform = dtcwt.Transform2d(biort='near_sym_a', qshift='qshift_a')
 dataT = transform.forward(noise,nlevels=nLevels)
 lvl1Filters=dtcwt.coeffs.biort('near_sym_a')
