@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
@@ -41,7 +41,7 @@ import matplotlib.colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.ticker import MultipleLocator
 import sys
-import viridis
+#import viridis
 
 h5FH1=h5py.File(sys.argv[1])
 

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
@@ -38,7 +38,7 @@ import matplotlib.colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.ticker import MultipleLocator
 import sys
-import viridis
+#import viridis
 
 h5FH1=h5py.File(sys.argv[1])
 
@@ -63,7 +63,7 @@ for i in range(2,7,2):
     iScale = scales[i]
     s=np.power(2.0,iScale)
     lambd=s*(2.0*np.pi)/np.sqrt(2.0+0.5)
-    imArr=np.copy(coeffs[iScale,iOri,:,:,0])
+    imArr=np.copy(coeffs[iScale,0,:,:,0])
     ax=axes.flat[imCount]
     minIm=np.min(imArr)
     maxIm=np.max(imArr)
@@ -82,7 +82,7 @@ for i in range(2,7,2):
     iScale=scales[i]
     s=np.power(2.0,iScale)
     lambd=s*(2.0*np.pi)/np.sqrt(2.0+0.5)
-    imArr=np.copy(coeffs[iScale,iOri,:,:,0])
+    imArr=np.copy(coeffs[iScale,0,:,:,0])
     ax=axes.flat[imCount]
     minIm=np.min(imArr)
     maxIm=np.max(imArr)
