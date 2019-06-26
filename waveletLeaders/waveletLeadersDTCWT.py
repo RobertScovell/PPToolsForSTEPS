@@ -50,8 +50,6 @@ import dtcwt
 import legendreTransformation
 import fracInt
 
-#import colormaps # from dir ../pylib
-
 batchFlag=os.getenv("BATCHMODE")
 if batchFlag == None or batchFlag=="0":
     batchMode=False
