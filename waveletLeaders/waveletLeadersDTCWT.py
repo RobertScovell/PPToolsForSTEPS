@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # -----------------------------------------------------------------------------
@@ -50,7 +50,7 @@ import dtcwt
 import legendreTransformation
 import fracInt
 
-import colormaps # from dir ../pylib
+#import colormaps # from dir ../pylib
 
 batchFlag=os.getenv("BATCHMODE")
 if batchFlag == None or batchFlag=="0":
@@ -71,20 +71,20 @@ nLevels = int(np.floor(max(np.log2(ny),np.log2(nx))))
 
 # Uncomment this to apply fractional integration before WaveletLeaders.
 # This might help to resolve singularity spectrum in some cases (possibly due to presence of negative Holder exponents).
-noise=fracInt.fractionalIntegration(noise,-0.5)
+#noise=fracInt.fractionalIntegration(noise,-0.5)
 
 # Do not use rotationally-invariant transform. Adantage is much shorter filters. Disadvantage is that maximum mod over orientations may not be meaningful?
 # Use length 10 'a' filters here, rather than the length 14 'b' (or length 18 'b_bp'). 
-transform = dtcwt.Transform2d(biort='near_sym_a', qshift='qshift_a')
-dataT = transform.forward(noise,nlevels=nLevels)
-lvl1Filters=dtcwt.coeffs.biort('near_sym_a')
-lvl2Filters=dtcwt.coeffs.qshift('qshift_a')
+#transform = dtcwt.Transform2d(biort='near_sym_a', qshift='qshift_a')
+#dataT = transform.forward(noise,nlevels=nLevels)
+#lvl1Filters=dtcwt.coeffs.biort('near_sym_a')
+#lvl2Filters=dtcwt.coeffs.qshift('qshift_a')
 
 ## Use rotationally-invariant transform. No inversion is required and need to ensure that maximum modulus over orientations is meaningful.
-#transform = dtcwt.Transform2d(biort='near_sym_b_bp', qshift='qshift_b_bp')
-#dataT = transform.forward(noise,nlevels=nLevels)
-#lvl1Filters=dtcwt.coeffs.biort('near_sym_b_bp')
-#lvl2Filters=dtcwt.coeffs.qshift('qshift_b_bp')
+transform = dtcwt.Transform2d(biort='near_sym_b_bp', qshift='qshift_b_bp')
+dataT = transform.forward(noise,nlevels=nLevels)
+lvl1Filters=dtcwt.coeffs.biort('near_sym_b_bp')
+lvl2Filters=dtcwt.coeffs.qshift('qshift_b_bp')
 
 # Routine to calculate effective filters at required level. Used to calculate length of filter.
 def iterConvFilters(h0a,h1a,level,dloFirst=None):
@@ -117,17 +117,19 @@ coeffsRescaled=np.empty((nLevels,6,dataT.highpasses[0].shape[0],dataT.highpasses
 ln2Scales=[]
 for iLev in range(nLevels):
     hp=dataT.highpasses[iLev]
-    print hp.shape
+    print(hp.shape)
     # Create index arrays that label block-subdivisions of the hp coefficients at this level
     nny=(ny/2)/hp.shape[0]
     nnx=(nx/2)/hp.shape[1]
     newArrIndsY=np.floor_divide(np.arange(ny/2),nny)
     newArrIndsX=np.floor_divide(np.arange(nx/2),nnx)
     yy,xx=np.meshgrid(newArrIndsY,newArrIndsX)
+    yy=yy.astype(np.int)
+    xx=xx.astype(np.int)
     ln2Scales.append(iLev+1)
     for iOri in range(6):
         # Put the hp coefficients on highest resolution grid and take absolute value
-        coeffsRescaled[iLev,iOri]=np.absolute(hp[xx.flatten(),yy.flatten(),iOri].reshape((nx/2,ny/2)))
+        coeffsRescaled[iLev,iOri]=np.absolute(hp[xx.flatten(),yy.flatten(),iOri].reshape((int(nx/2),int(ny/2))))
         # Renormalize from L2 to L1-norm by multiplying by a factor of 1/sqrt(2) per level per dimension.
         coeffsRescaled[iLev,iOri]*=np.power(2.0,-1.0*float(iLev))
 
@@ -171,7 +173,7 @@ for iLev in range(nLevels):
         else:
             nbSz=3*h0a5[iLev-1].shape[0]
         iScale=ln2Scales[iLev] 
-        print "Scale: " + str(iLev-1) + " nbSz: " + str(nbSz)
+        print("Scale: " + str(iLev-1) + " nbSz: " + str(nbSz))
 
         thisScaleMaxima=np.empty_like(oriMax[0:iLev+1,:,:])
         # Create an array of maxima along columns up to scale iLev
@@ -203,6 +205,7 @@ if batchMode==False:
     cbar_ax = fig.add_axes([0.15, 0.05, 0.7, 0.05])
     cb=fig.colorbar(im, cax=cbar_ax, orientation='horizontal')
     cb.ax.set_title("L1 modulus of coefficient / leader")
+    plt.tight_layout()
     plt.show()
 
 # Compute qth order structure functions
@@ -218,24 +221,24 @@ SNN=np.zeros((nLevels,nq))
 for iLev in range(maxScale):
     minWLs=np.min(waveletLeaders[iLev])
     maxWLs=np.max(waveletLeaders[iLev])
-    print minWLs,maxWLs
+    print(minWLs,maxWLs)
     if ( np.absolute(maxWLs-minWLs) > wlThresh ) and ( wlThresh > 0.0 ):
         nzWLs=np.where(waveletLeaders[iLev]>minWLs+wlThresh*(maxWLs-minWLs))
     else:
         nzWLs=np.where(waveletLeaders[iLev]<np.inf)
     nj=len(nzWLs[0])
     f=1
-    print "Number of non-zero WLs at level " + str(iLev) + ": " + str(nj)
+    print("Number of non-zero WLs at level " + str(iLev) + ": " + str(nj))
     for iq in range(nq):
         S[iLev,iq]=(1.0/float(nj))*np.sum(np.power(f*waveletLeaders[iLev][nzWLs],qvals[iq]))
         if np.isnan(S[iLev,iq]) or np.isinf(S[iLev,iq]):
-            print nj
-            print waveletLeaders[iLev][nzWLs]
-            print qvals[iq]
+            print(nj)
+            print(waveletLeaders[iLev][nzWLs])
+            print(qvals[iq])
         SNN[iLev,iq]=np.sum(np.power(f*waveletLeaders[iLev][nzWLs],qvals[iq]))
         if np.isnan(SNN[iLev,iq]) or np.isinf(SNN[iLev,iq]):
-            print waveletLeaders[iLev][nzWLs]
-            print qvals[iq]
+            print(waveletLeaders[iLev][nzWLs])
+            print(qvals[iq])
 
 # Display S(a,q) vs a at selected scales
 if batchMode==False:
@@ -271,7 +274,7 @@ if batchMode==False:
     # Compute D(h) using direct Legendre Transformation of tau(q)
     hvals,dvals=legendreTransformation.transform(tauq,qvals[:nq],xstep=qstep)
     plt.scatter(np.array(hvals),dvals,marker='^')
-    plt.xlabel(u'Hölder exponent $\\alpha$')
+    plt.xlabel('Hölder exponent $\\alpha$')
     plt.ylabel("Dimension $D(\\alpha)$")
     plt.show()
 
@@ -317,7 +320,7 @@ else:
         hfit[iq,:]=np.polyfit(ln2Scales[minScale:maxScale],V[minScale:maxScale,iq],order)
         dfit[iq,:]=np.polyfit(ln2Scales[minScale:maxScale],U[minScale:maxScale,iq],order)
     plt.scatter(np.array(hfit[:,0]),dfit[:,0]+2,marker='o')
-    plt.xlabel(u'Hölder exponent $\\alpha$')
+    plt.xlabel('Hölder exponent $\\alpha$')
     plt.ylabel("Dimension $D(\\alpha)$")
     plt.show()
     
