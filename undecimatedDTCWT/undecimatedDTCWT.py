@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
@@ -373,14 +373,14 @@ for iLev in range(nLevels-1,nLevels):
     maxa=-1.0e10
     mina=1.0e10
     for iOri in range(6):
-        print coeffs[iLev][iOri].shape
+        print(coeffs[iLev][iOri].shape)
         maxrp=np.max(np.real(coeffs[iLev][iOri]))
         minrp=np.min(np.real(coeffs[iLev][iOri]))
         maxip=np.max(np.imag(coeffs[iLev][iOri]))
         minip=np.min(np.imag(coeffs[iLev][iOri]))
         maxap=np.max(np.absolute(coeffs[iLev][iOri]))
         minap=np.min(np.absolute(coeffs[iLev][iOri]))
-        print maxrp,minrp,maxip,minip,maxap,minap
+        print(maxrp,minrp,maxip,minip,maxap,minap)
         if maxrp > maxr:
             maxr=maxrp
         if minrp < minr:
