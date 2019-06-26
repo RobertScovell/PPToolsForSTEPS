@@ -1,16 +1,11 @@
 #!/bin/bash
 
-LIBFFTW3DIR=/usr/local
-BOOSTDIR=/usr/local
+LIBFFTW3DIR=/usr
+BOOSTDIR=/usr
+HDF5DIR=/usr
 
-#CPP=cc
-CPP=g++
+CPPFLAGS="-O3 -fopenmp -DBOOST_DISABLE_ASSERTS -I${BOOSTDIR}/include -I${LIBFFTW3DIR}/include -I${HDF5DIR}/include"
+LDFLAGS="-fopenmp -L${BOOSTDIR}/lib -L${LIBFFTW3DIR}/lib -lfftw3 -lhdf5"
 
-CPPFLAGS="-O3 -fopenmp -DBOOST_DISABLE_ASSERTS -I${LIBFFTW3DIR}/include -I${BOOSTDIR}/include"
-
-#LDFLAGS="-L${LIBFFTW3DIR}/lib -L${BOOSTDIR}/lib ${LDFLAGS} -lc++ -lfftw3 -lhdf5 -lm"
-LDFLAGS=-L"${LIBFFTW3DIR}/lib" -L"${BOOSTDIR}/lib" ${LDFLAGS} -lfftw3 -lhdf5 -lm 
-
-${CPP} ${CPPFLAGS} mexicanHatTransform.cc -o mexicanHatTransform ${LDFLAGS}
-${CPP} ${CPPFLAGS} morletTransform.cc -o morletTransform ${LDFLAGS}
-
+g++ ${CPPFLAGS} mexicanHatTransform.cc -o mexicanHatTransform ${LDFLAGS}
+g++ ${CPPFLAGS} morletTransform.cc -o morletTransform ${LDFLAGS} 

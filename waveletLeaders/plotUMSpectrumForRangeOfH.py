@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
@@ -64,7 +64,7 @@ for H in ["0.2","0.3","0.4","0.5","0.6","0.7","0.8"]:
     
     for i in range(0,50):
         try:
-            print files[i]
+            print(files[i])
             Sdata=np.genfromtxt(files[i],delimiter=",")
             SNN+=Sdata
             sumU1data=np.genfromtxt(filesS1[i],delimiter=",")

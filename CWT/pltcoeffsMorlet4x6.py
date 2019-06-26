@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-
 # -*- coding: utf-8 -*-
+
 # -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2017-2019 Met Office.
 # All rights reserved.
@@ -35,19 +35,18 @@ import h5py
 import numpy as np
 import matplotlib as mpl
 mpl.rcParams['image.interpolation']='nearest'
-mpl.rcParams['font.size'] = 14
+mpl.rcParams['font.size'] = 10
 import matplotlib.pyplot as plt
 import matplotlib.colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.ticker import MultipleLocator
 import sys
-#import viridis
 
 h5FH1=h5py.File(sys.argv[1])
 
 coeffs=np.copy(h5FH1['coefficients'])
 
-# Dataset {34/34, 1/1, 1024/1024, 1024/1024, 2/2}
+# Dataset dimensions #scales x #rotations x #y-pixels x #x-pixels x 2. Example: (34,12,1024,1024,2)
 
 def truncate_colormap(cmap, minval=0.0, maxval=1.0, n=100):
     new_cmap = matplotlib.colors.LinearSegmentedColormap.from_list(

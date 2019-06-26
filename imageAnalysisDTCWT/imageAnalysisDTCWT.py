@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # -----------------------------------------------------------------------------
@@ -39,12 +39,11 @@ import numpy as np
 import matplotlib as mpl
 import scipy.ndimage
 mpl.rcParams['image.interpolation']='nearest'
-mpl.rcParams['font.size']=14
+#mpl.rcParams['font.size']=14
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import dtcwt
-
-import colormaps # from dir ../pylib
 
 image=np.genfromtxt(sys.argv[1],delimiter=",")
 
@@ -63,32 +62,43 @@ dataT = transform.forward(imageLn,nlevels=nLevels)
 fracPowInOri=np.empty((nLevels-1,6))
 
 for iLev in range(nLevels-1):
+    absLev=np.absolute(dataT.highpasses[iLev][:,:,:])
+    smallLevCoeff=absLev<1.0e-2*np.max(absLev) # value of 0.01 chosen by trial-and-error
+    powInLev=np.sum(np.square(absLev[smallLevCoeff==False]))
     for iOri in range(6):
         # May want to avoid summing zeros but this is not done here.
-        powInOri=np.sum(np.square(np.absolute(dataT.highpasses[iLev][:,:,iOri])))
-        fracPowInOri[iLev,iOri]=powInOri/np.sum(np.square(np.absolute(dataT.highpasses[iLev][:,:,:])))
+        absOri=np.absolute(dataT.highpasses[iLev][:,:,iOri])
+        smallOriCoeff=absOri<1.0e-2*np.max(absOri) # value of 0.01 chosen by trial-and-error
+        powInOri=np.sum(np.square(absOri[smallOriCoeff==False]))
+        fracPowInOri[iLev,iOri]=powInOri/powInLev
 
 plt.subplot(1,2,1)
+im=plt.imshow(np.log2(image),cmap=plt.get_cmap('viridis'))
 plt.xlabel("Distance East [km]")
 plt.ylabel("Distance North [km]")
-plt.imshow(np.log2(image),cmap=plt.get_cmap('viridis'))
-cb=plt.colorbar()
-cb.ax.set_ylabel("Log rainfall rate [$log_2 mm/h$]")
+ax=plt.gca()
+divider = make_axes_locatable(ax)
+cax = divider.append_axes("right", size="5%", pad=0.05)
+cb=plt.colorbar(im,cax=cax)
+cb.set_label("Log rainfall rate [$\log_2\,mm\,h^{-1}$]")
 
 plt.subplot(1,2,2)
-plt.imshow(fracPowInOri,cmap=plt.get_cmap('viridis'))
-cb=plt.colorbar()
-cb.ax.set_ylabel("Fraction of power in each subband")
-plt.xticks([0.0,1.0,2.0,3.0,4.0,5.0],[
-    "$+15^{\\circ}$",
-    "$+45^{\\circ}$",
-    "$+75^{\\circ}$",
-    "$+105^{\\circ}$",
-    "$+135^{\\circ}$",
-    "$+165^{\\circ}$"],rotation=90)
-plt.yticks([0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0],[1,2,3,4,5,6,7,8])
+im=plt.imshow(fracPowInOri,cmap=plt.get_cmap('viridis'))
 plt.xlabel("Orientation [$^{\\circ}$ from +ve $x$-axis]")
 plt.ylabel("Dyadic scale level")
+plt.xticks([0.0,1.0,2.0,3.0,4.0,5.0],[
+    u"$+15^{\\circ}$",
+    u"$+45^{\\circ}$",
+    u"$+75^{\\circ}$",
+    u"$+105^{\\circ}$",
+    u"$+135^{\\circ}$",
+    u"$+165^{\\circ}$"],rotation=90)
+plt.yticks([0.0,1.0,2.0,3.0,4.0,5.0,6.0,7.0],[1,2,3,4,5,6,7,8])
+ax=plt.gca()
+divider = make_axes_locatable(ax)
+cax = divider.append_axes("right", size="5%", pad=0.05)
+cb=plt.colorbar(im,cax=cax)
+cb.set_label("Fraction of power in each subband")
 plt.tight_layout()
 plt.show()
 
@@ -119,7 +129,7 @@ for iLev in range(2,nLevels-3):
     yavhalfsm=scipy.ndimage.gaussian_filter(yavhalf,sigma=2.0)
     s=2**(iLev+1)
     if s < 16:
-        skip=16/s
+        skip=int(16/s)
         xavhalfsm=xavhalfsm[::skip,::skip]
         yavhalfsm=yavhalfsm[::skip,::skip]
     else:

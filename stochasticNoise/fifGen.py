@@ -1,6 +1,35 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python3
 # encoding: utf-8
-# (C) Crown Copyright 2019, the Met Office.
+
+# -----------------------------------------------------------------------------
+# (C) British Crown Copyright 2017-2019 Met Office.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# * Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+#
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+#
+# * Neither the name of the copyright holder nor the names of its
+#   contributors may be used to endorse or promote products derived from
+#   this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
 
 # This code generates 2D realisations of the Fractionally Integrated Flux model, based on an algorithm by Lovejoy and Schertzer (2010).
 # Parameters are:
@@ -67,7 +96,7 @@ def eps2D(ny,nx,alpha,C1):
     beta=-1
     scal=np.square(xx)+np.square(yy)
     sing=fracEpsilon(scal,alpha)
-    rvs=scipy.stats.levy_stable.rvs(alpha=alpha,beta=beta,loc=0.0,scale=1.0,size=(ny,nx))
+    rvs=scipy.stats.levy_stable.rvs(alpha,beta,size=(ny,nx))
 
     #### THIS IS NOT PART OF THE ORIGINAL MATHEMATICA IMPLEMENTATION
     maxrv=np.max(rvs)
@@ -75,6 +104,8 @@ def eps2D(ny,nx,alpha,C1):
     #### END
 
     ggen1=np.power((C1/MDf),1./alpha)*rvs
+    print(ggen1.shape)
+    print(sing.shape)
     ggen1alpha=scipy.signal.fftconvolve(ggen1,sing)
     ggen1alpha[ggen1alpha<-200.]=-200.
     ggen1alpha=np.exp(ggen1alpha)
@@ -86,7 +117,7 @@ def eps2D(ny,nx,alpha,C1):
 umf=eps2D(ny,nx,alpha,C1)
 nanMask=np.isnan(umf)
 if np.sum(nanMask) != 0:
-    print "Warning: converting NaN values to 0.0"
+    print("Warning: converting NaN values to 0.0")
     umf[nanMask]=0.0
 #### END
 
@@ -107,7 +138,14 @@ if ( np.absolute(H) > 1.0e-3 ):
 else:
     umfFrac=umf
 
+#### THIS IS NOT PART OF THE ORIGINAL MATHEMATICA IMPLEMENTATION
+negMask=umfFrac<1.0e-6
+if np.sum(negMask) != 0:
+    print("Warning: capping low values to 1.0e-6")
+    umf[negMask]=1.0e-6
+#### END
+
 # Take only the central window, to avoid edge effects
-umfFrac=umfFrac[umfFrac.shape[0]/4:-umfFrac.shape[0]/4,umfFrac.shape[1]/4:-umfFrac.shape[1]/4]
+umfFrac=umfFrac[int(umfFrac.shape[0]/4):int(umfFrac.shape[0]/4)+ny,int(umfFrac.shape[1]/4):int(umfFrac.shape[1]/4)+nx]
 np.savetxt(outFN,umfFrac,delimiter=",",fmt="%f")
 
