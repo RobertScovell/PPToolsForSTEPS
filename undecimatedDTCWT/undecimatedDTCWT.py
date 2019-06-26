@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-
 # -*- coding: utf-8 -*-
+
 # -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2017-2019 Met Office.
 # All rights reserved.
@@ -44,8 +44,6 @@ import scipy.ndimage
 
 import pywt
 import dtcwt
-
-import colormaps # from dir ../pylib
 
 def upscaleFilter(h):
     hUp=np.zeros(2*h.shape[0])
