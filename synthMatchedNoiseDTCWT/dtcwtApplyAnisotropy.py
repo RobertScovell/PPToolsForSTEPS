@@ -1,6 +1,6 @@
-#!/bin/env python2.7
-
+#!/bin/env python3
 # -*- coding: utf-8 -*-
+
 # -----------------------------------------------------------------------------
 # (C) British Crown Copyright 2017-2019 Met Office.
 # All rights reserved.
@@ -37,7 +37,7 @@ import numpy as np
 import numpy.random
 import matplotlib as mpl
 mpl.rcParams['image.interpolation']='nearest'
-mpl.rcParams['font.size']=14
+#mpl.rcParams['font.size']=12
 import scipy.ndimage
 import h5py
 import sys
@@ -116,5 +116,6 @@ divider = make_axes_locatable(ax)
 cax = divider.append_axes("right", size="5%", pad=0.05)
 cb=plt.colorbar(im,cax=cax)
 cb.set_label("$\\log_{2}(R)$")
+plt.tight_layout()
 plt.show()
 
