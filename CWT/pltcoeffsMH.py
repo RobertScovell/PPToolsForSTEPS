@@ -86,7 +86,6 @@ for i in range(2,7,2):
     s=np.power(2.0,iScale)
     lambd=s*(2.0*np.pi)/np.sqrt(2.0+0.5)
     imArr=np.copy(coeffs[iScale,0,:,:,0])
-#    ax=axes.flat[imCount]
     minIm=np.min(imArr)
     maxIm=np.max(imArr)
     maxAbs=max(minIm,maxIm)

@@ -9,4 +9,3 @@ LDFLAGS="-fopenmp -L${BOOSTDIR}/lib -L${LIBFFTW3DIR}/lib -lfftw3 -lhdf5"
 
 g++ ${CPPFLAGS} mexicanHatTransform.cc -o mexicanHatTransform ${LDFLAGS}
 g++ ${CPPFLAGS} morletTransform.cc -o morletTransform ${LDFLAGS} 
- 
