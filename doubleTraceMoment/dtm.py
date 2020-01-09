@@ -59,30 +59,32 @@ def pyramid(image,nLevs):
     return outArr
 
 
-# Load noise
-noise=np.genfromtxt(sys.argv[1],delimiter=",")
-ny=noise.shape[0]
-nx=noise.shape[1]
-
-# compute DTDWT 
-nLevels = int(np.floor(max(np.log2(ny),np.log2(nx))))
+# Load data
+data=np.genfromtxt(sys.argv[1],delimiter=",")
+print("Mean:",np.mean(data))
 
 # Uncomment this to apply fractional integration before analysis.
 # This can convert non-conservative to conservative multifractals.
-#noise=fracInt.fractionalIntegration(noise,-1.0)
-#noise[noise<0.0]=0.0 # fractional integration can lead to negative fluxes!
+if len(sys.argv)>2:
+    H=float(sys.argv[2])
+    if np.abs(H) > 1.0e-3:
+        print("Fractional integration, order=",-H)
+        data=fracInt.fractionalIntegration(data,H)
+
+# Fractional integration can lead to negative fluxes
+# Set values below a small threshold to the small threshold value
+data[data<1.0e-6]=1.0e-6
 
 # Determine the number of decomposition levels needed
-n0=noise.shape[0]
-n1=noise.shape[1]
+n0=data.shape[0]
+n1=data.shape[1]
 nLevs=int(np.floor(np.log2(np.min((n0,n1)))))
 
 # Compute bare fluxes as pyramid
-imPyramid=pyramid(noise,nLevs)
-print(imPyramid)
+imPyramid=pyramid(data,nLevs)
 
 minScale=1
-maxScale=6
+maxScale=5
 D=2.
 nScales=maxScale-minScale+1
 
@@ -91,7 +93,7 @@ epsLambda0=imPyramid[minScale]
 lambda0=np.power(2.,maxScale)/np.power(2.,minScale)
 
 etaVals=np.exp(np.linspace(-2.0,1.0,num=31,endpoint=True))
-qVals = [ 1.5 ]
+qVals = [ 1.5, 2.0, 2.5, 3.0 ]
 
 tr=np.empty((len(qVals),len(etaVals),nScales))
 kQEta=np.empty((len(qVals),len(etaVals)))
