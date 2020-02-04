@@ -30,18 +30,17 @@
 
 import numpy as np
 
-def fractionalIntegration(noise,fracIntOffset):
-    noiseFFT=np.fft.fftshift(np.fft.fft2(noise))
-    for iky in range(0,noise.shape[0]):
-        for ikx in range(0,noise.shape[1]):
-            if ( iky == noise.shape[1]/2 and ikx == noise.shape[0]/2 ):
-                noise[iky,ikx]=0.0
-                continue
-            kx=float(ikx-noise.shape[1]/2)
-            ky=float(iky-noise.shape[0]/2)
-            k=np.sqrt(kx*kx+ky*ky)
-            fac = np.power(k,fracIntOffset)
-            noiseFFT[iky,ikx] *= fac
-    return np.real(np.fft.ifft2(np.fft.ifftshift(noiseFFT)))
-
-
+def fractionalIntegration(noise,H):
+    # Define frequency domain
+    freqs0=np.fft.fftfreq(noise.shape[0])
+    freqs1=np.fft.fftfreq(noise.shape[1])
+    ff0,ff1=np.meshgrid(freqs0,freqs1)
+    ff=np.sqrt(np.square(ff0)+np.square(ff1))
+    ff[0,0]=1. # to give DC component factor of 1. 
+    # Define factor for fractional integration
+    fac=np.power(ff,-H)
+    # Apply factor in freq space
+    noiseFFT=np.fft.fft2(noise)
+    noiseFFT*=fac
+    noiseinv=np.fft.ifft2(noiseFFT)
+    return np.real(noiseinv)

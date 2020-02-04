@@ -20,23 +20,23 @@ def Frac(scal=None,alpha=None,*args,**kwargs):
 
     exlambda=np.exp(- (scal / lcut) ** 4)
 
-    exlambda[exlambda<1.0e-16]=0.
+    exlambda[exlambda<1.0e-16]=1.0e-16
     
     exlambda2=np.exp(- (scal / lcut2) ** 4)
 
-    exlambda2[exlambda2<1.0e-16]=0.
+    exlambda2[exlambda2<1.0e-16]=1.0e-16
     
     sing=np.power(scal, (- 1 / alphap))
 
     singsmooth=np.multiply(sing,exlambda)
 
-    singsmooth[singsmooth<1.0e-16]=0.
+    singsmooth[singsmooth<1.0e-16]=1.0e-16
     
     t1=np.sum(singsmooth)
 
     singsmooth2=np.multiply(sing,exlambda2)
 
-    singsmooth2[singsmooth2<1.0e-16]=0.
+    singsmooth2[singsmooth2<1.0e-16]=1.0e-16
     
     t2=np.sum(singsmooth2)
 
@@ -44,11 +44,11 @@ def Frac(scal=None,alpha=None,*args,**kwargs):
 
     ff=np.exp(- scal / 3)
 
-    ff[ff<1.0e-16]=0.
+    ff[ff<1.0e-16]=1.0e-16
     
     singsmooth=np.multiply(sing,ff)
 
-    singsmooth[singsmooth<1.0e-16]=0.
+    singsmooth[singsmooth<1.0e-16]=1.e-16
     
     G=np.sum(singsmooth)
 
@@ -56,7 +56,7 @@ def Frac(scal=None,alpha=None,*args,**kwargs):
 
     csing=(np.multiply(sing,(1 + np.multiply(a,ff))))
 
-    csing[csing<1.0e-16]=0.
+    csing[csing<1.0e-16]=1.0e-16
     
     fragged=np.power(csing, (1 / (alpha - 1)))
     return fragged
@@ -149,7 +149,6 @@ def eps2D(lambdat=None,lambday=None,alpha=None,C1=None,Switch=None,*args,**kwarg
 
     Hs=np.multiply(Heavi,sing)
 
-#    ggen1alpha=np.real(np.fft.ifft2(np.multiply(np.fft.fft2(ggen1),np.fft.fft2(Hs))))
     ggen1alpha=np.real(np.fft.ifft2(np.multiply(np.fft.fft2(ggen1),np.fft.fft2(Hs))))
 
     ggen1alpha=np.exp(ggen1alpha)
@@ -174,7 +173,8 @@ if __name__ == '__main__':
     # Fractionally integrate again to get non-conservative field
     if np.abs(H)>1.0e-4:
         nonConsFIF=fracInt.fractionalIntegration(consUMF,H)
-        nonConsFIF[nonConsFIF<1.0e-8]=1.0e-8
+        nonConsFIF/=np.mean(nonConsFIF)
+        nonConsFIF[nonConsFIF<1.0e-16]=1.0e-16
     else:
         nonConsFIF=consUMF
 

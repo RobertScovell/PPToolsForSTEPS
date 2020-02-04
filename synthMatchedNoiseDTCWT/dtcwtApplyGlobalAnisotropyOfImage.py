@@ -47,8 +47,6 @@ import matplotlib.cm as cm
 import matplotlib.colors as clr
 import dtcwt
 
-nLevelsToBlend=4
-
 # Load rain image from CSV file and convert to log-R.
 image=np.genfromtxt(sys.argv[1],delimiter=",")
 image=image[::-1,:]
@@ -115,35 +113,26 @@ fracPowInOri=np.empty((nLevels,6))
 fracPowInOriRnd=np.empty((nLevels,6))
 
 for iLev in range(nLevels):
-#        mask=np.sum(np.absolute(dataT.highpasses[iLev][:,:,:]),axis=2)<1.0e-4
-        powInLev=np.sum(np.square(np.absolute(dataT.highpasses[iLev][:,:,:])),axis=2)/6.
-        powInLevSm=scipy.ndimage.gaussian_filter(powInLev,sigma=3.0)
-        powInLevRnd=np.sum(np.square(np.absolute(dataRndT.highpasses[iLev][:,:,:])),axis=2)/6.
-        powInLevRndSm=scipy.ndimage.gaussian_filter(powInLevRnd,sigma=3.0)
+        mask=np.sum(np.absolute(dataT.highpasses[iLev][:,:,:]),axis=2)<1.0e-4
+        powInLev=np.mean(np.square(np.absolute(dataT.highpasses[iLev][~mask,:])))
+        powInLevRnd=np.mean(np.square(np.absolute(dataRndT.highpasses[iLev][:,:,:])))
         for iOri in range(6):
             # If rotationally-varying wavelets are used, bear in mind power
             # will vary due to DTCWT, not just from the image. This is OK
             # because orientations aren't mixed in this approach.
 
             # Fraction of power in each orientation, for original image
-#            mask=np.absolute(dataT.highpasses[iLev][:,:,iOri])<1.0e-4
-            powInOri=np.square(np.absolute(dataT.highpasses[iLev][:,:,iOri]))
-            powInOriSm=scipy.ndimage.gaussian_filter(powInOri,sigma=3.0)
-            dataFac=powInOriSm/powInLevSm
+            mask=np.absolute(dataT.highpasses[iLev][:,:,iOri])<1.0e-4
+            powInOri=np.mean(np.square(np.absolute(dataT.highpasses[iLev][~mask,iOri])))
+            fracPowInOri[iLev,iOri]=powInOri/powInLev
 
             # Fraction of power in each orientation, for random image
-            powInOriRnd=np.square(np.absolute(dataRndT.highpasses[iLev][:,:,iOri]))
-            powInOriRndSm=scipy.ndimage.gaussian_filter(powInOriRnd,sigma=3.0)
-            dataRndFac=powInOriRndSm/powInLevRndSm
+            powInOriRnd=np.mean(np.square(np.absolute(dataRndT.highpasses[iLev][:,:,iOri])))
+            fracPowInOriRnd[iLev,iOri]=powInOriRnd/powInLevRnd
 
             # Power conversion factor actual im -> rnd im
-            alpha=dataFac/dataRndFac
-            if iLev < nLevelsToBlend:
-                dataRndT.highpasses[iLev][:,:,iOri]*=alpha#np.sqrt(alpha)
-                dataRndT.highpasses[iLev][:,:,iOri]*=np.sqrt(np.sum(powInLev)/np.sum(powInLevRnd))
-            else:
-                dataRndT.highpasses[iLev][:,:,iOri]=dataT.highpasses[iLev][:,:,iOri]
-dataRndT.lowpass[:,:]=dataT.lowpass[:,:]
+            alpha=fracPowInOri[iLev,iOri]/fracPowInOriRnd[iLev,iOri]
+            dataRndT.highpasses[iLev][:,:,iOri]*=alpha#np.sqrt(alpha)
 
 # Invert transform
 imageRec=transform.inverse(dataRndT)
@@ -162,7 +151,7 @@ cax = divider.append_axes("right", size="5%", pad=0.05)
 cb=plt.colorbar(im,cax=cax)
 cb.set_label("$\\log_{2}(R)$")
 plt.subplot(1,2,2)
-im=plt.imshow(imageRec,vmin=-3.0,vmax=np.max(imageLn))#,vmax=3.0)
+im=plt.imshow(imageRec,vmin=-3.0)#,vmax=3.0)
 plt.xlabel("x-pixels")
 plt.ylabel("y-pixels")
 ax=plt.gca()

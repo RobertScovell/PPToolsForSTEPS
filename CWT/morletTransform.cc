@@ -63,24 +63,34 @@ int main(int argc,char *argv[]) {
   }
 
   double lambdaBot=2.0;
-  double lambdaTop=512.0;
+  double lambdaTop=float(nx);
   // Use Cauchy wavelet; order 4,4 with a cone of +/- 2 Pi / nK; scale sep. of 1 octave (1 voices / octave).
   //  int nK = 12; 
   //  double deltaS = 1.0;
   //  cauchyAntoine99 wvt(4,4,-2.0*M_PI/static_cast<double>(nK),2.0*M_PI/static_cast<double>(nK),1.0,0.0);
 
   // Use Morlet wavelet with 24 orientations and 1 voice / octave ( this does not form a tight frame ).
-  int nK = 24;
+  int nK = 6;
   double deltaS = 1.0;
   morletWangLu2010 wvt; 
   std::cout << wvt.wavelengthToScale(lambdaBot) << std::endl;
   std::cout << wvt.wavelengthToScale(lambdaTop) << std::endl;
   boost::multi_array<std::complex<double>,2ul> image(boost::extents[ny][nx]);
   readTxtArray(image,inputDataFn.c_str());
+//  myCWT2d cwt(image,&wvt,deltaS,nK,1.981,512.0);//#wvt.wavelengthToScale(lambdaBot),wvt.wavelengthToScale(lambdaTop));
   myCWT2d cwt(image,&wvt,deltaS,nK,wvt.wavelengthToScale(lambdaBot),wvt.wavelengthToScale(lambdaTop));
   std::cout << "Computing coeffs" << std::endl;
   cwt.computeCoeffs();
+  std::vector<double> freqCentres;
+  std::vector<double> fWidthsSq;
+  std::vector<double> rWidthsSq;
+  cwt.calcFilterFreqBarycentres(freqCentres,fWidthsSq,rWidthsSq);
+  for ( int i = 0 ; i < freqCentres.size() ; i ++ ) {
+      std::cout << freqCentres[i] << "," << image.shape()[0]*std::sqrt(fWidthsSq[i]) << "," << image.shape()[0]*std::sqrt(rWidthsSq[i]) << std::endl;
+  }
   std::cout << "Writing coeffs" << std::endl;
+
+//  exit(1);
   cwt.writeHDF5(outputDataFn.c_str());
 
   return 0;
