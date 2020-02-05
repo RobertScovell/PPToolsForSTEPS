@@ -1,4 +1,4 @@
-#!/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # -----------------------------------------------------------------------------
@@ -47,21 +47,27 @@ import matplotlib.cm as cm
 import matplotlib.colors as clr
 import dtcwt
 
-nLevelsToBlend=3
+nLevelsToBlend=4
 
 # Load rain image from CSV file and convert to log-R.
 image=np.genfromtxt(sys.argv[1],delimiter=",")
-imageLn=np.log2(image)
-imageNZ=image>np.min(image)+1.0e-4
-wetFrac=np.sum(imageNZ)/float(image.size)
-
-# Load random realization from CSV, resize to rain image domain (assume it's larger) and convert to log-R.
+image=image[::-1,:]
+print(np.max(image))
+#nzMask=image>np.min(image)+1.0e-4
+imageMean=np.mean(image)
+# normalize (assume that contributions below threshold contribute little to the mean)
+image/=imageMean
+# define threshold, taking into account normalization
+imageThresh=(1./32.-1.0e-10)/imageMean
+nzMask=image>imageThresh
+#wetFrac=np.sum(image>imageThresh)/float(image.size)
+#print("Wet frac: ",wetFrac)
+# Load random realization from CSV and convert to log-R.
 imageRnd=np.genfromtxt(sys.argv[2],delimiter=",")
-imageRnd=imageRnd[0:image.shape[0],0:image.shape[1]]
-imageMean=np.mean(image[imageNZ==True])
-imageRndMean=np.mean(imageRnd)
-imageRnd*=imageMean/imageRndMean
-imageRnd[imageRnd<np.min(image)+1.0e-4]=np.min(image)+1.0e-4
+imageRnd[imageRnd<1.0e-16]=1.0e-16
+#imNzMean=np.mean(image[nzMask])
+#print("Image non-zero mean:",imNzMean)
+#imageRnd*=imageMean
 imageLnRnd=np.log2(imageRnd)
 
 # compute DTDWTs 
@@ -73,72 +79,98 @@ nyRnd=image.shape[0]
 nxRnd=image.shape[1]
 nLevelsRnd = int(np.ceil(np.log2(nyRnd)))
 
-# Display rain image and random image side-by-side
-plt.subplot(1,2,1)
-plt.xlabel("Distance East [km]")
-plt.ylabel("Distance North [km]")
-plt.imshow(imageLn)#,vmin=-6.)
-cb=plt.colorbar()
-cb.ax.set_ylabel("Log rainfall rate [$\log_2 mm/h$]")
-plt.subplot(1,2,2)
-plt.xlabel("Distance East [km]")
-plt.ylabel("Distance North [km]")
-plt.imshow(imageLnRnd)#,vmin=-6.)
-cb=plt.colorbar()
-cb.ax.set_ylabel("Log rainfall rate [$\log_2 mm/h$]")
-plt.tight_layout()
-plt.show()
+# Compute dry drift (mean intensity in each distance transform bin)
+image[~nzMask]=imageThresh
+imageLn=np.log2(image)
+
+#dt=scipy.ndimage.morphology.distance_transform_edt(nzMask)
+
+#dtRange=int(np.max(dt))
+#dtBinMeans=np.zeros((dtRange))
+#for i in range(dtRange):
+#    dtBinMeans[i]=np.mean(imageLn[np.absolute(dt-i)<1.0e-3])
+#dtBinMeans[np.isnan(dtBinMeans)]=0.0
+#
+#imageDD=np.zeros_like(imageLn)
+#dtMeanFlat=np.mean(dtBinMeans[-1])
+#for i in range(dtRange):
+#    imageDD[dt.astype(np.int64)==i]=dtBinMeans[i]
+#imageDD[dt>=dtRange]=dtMeanFlat
+#
+## Subtract the dry drift from the image before DTCWT, to remove some of the bias in the power estimates
+#imageLn-=imageDD
 
 # Do / do not use modified wavelets to achieve directional invariance at the cost of
-# inaccurate reconstruction. 
+# inaccurate reconstruction.
 #transform = dtcwt.Transform2d(biort='near_sym_b_bp', qshift='qshift_b_bp')
-transform = dtcwt.Transform2d(biort='near_sym_a', qshift='qshift_a')
+transform = dtcwt.Transform2d(biort='near_sym_b', qshift='qshift_b')
 dataT = transform.forward(imageLn,nlevels=nLevels)
 dataRndT = transform.forward(imageLnRnd,nlevels=nLevels)
 coeffs=dataT.highpasses
 coeffsRnd=dataRndT.highpasses
 ln2Scales=[]
 
-print ("Replacing first "+str(nLevelsToBlend)+" levels of image with noise.")
-for iLev in range(nLevels):
-    absLev=np.absolute(dataT.highpasses[iLev][:,:,:])
-    smallCoeff=absLev<1.0e-2*np.max(absLev) # value of 0.01 chosen by trial-and-error
-    # Compute mean power over all coefficients
-    powLev=np.mean(np.square(absLev[smallCoeff==False]))
-    powLevRnd=np.mean(np.square(np.absolute(dataRndT.highpasses[iLev][:,:,:])))
-    for iOri in range(6):
-        fracPowOri=np.square(np.absolute(dataT.highpasses[iLev][:,:,iOri]))/powLev
-        fracPowOriRnd=np.square(np.absolute(dataRndT.highpasses[iLev][:,:,iOri]))/powLevRnd
-#        plt.subplot(1,2,1)
-#        plt.imshow(fracPowOri)
-#        plt.colorbar()
-#        plt.subplot(1,2,2)
-#        plt.imshow(fracPowOriRnd)
-#        plt.colorbar()
-#        plt.show()
-        # Smooth
-        fracPowOri=scipy.ndimage.gaussian_filter(fracPowOri,sigma=3.0)
-        fracPowOriRnd=scipy.ndimage.gaussian_filter(fracPowOriRnd,sigma=3.0)
-        # Adjust
-        if iLev < nLevelsToBlend: # change this to an integer value in [0,10], to replace with noise only up to that scale
-            dataRndT.highpasses[iLev][:,:,iOri]/=fracPowOriRnd
-            dataRndT.highpasses[iLev][:,:,iOri]*=fracPowOri
-        else:
-            dataRndT.highpasses[iLev][:,:,iOri]=dataT.highpasses[iLev][:,:,iOri]
+# Adjustment of noise image using fraction of power in each sub-band. 
+fracPowInOri=np.empty((nLevels,6))
+fracPowInOriRnd=np.empty((nLevels,6))
 
-# Overwrite the top-level low-pass coefficients from the random/blended transform with those from the rain image.
+for iLev in range(nLevels):
+#        mask=np.sum(np.absolute(dataT.highpasses[iLev][:,:,:]),axis=2)<1.0e-4
+        powInLev=np.sum(np.square(np.absolute(dataT.highpasses[iLev][:,:,:])),axis=2)/6.
+        powInLevSm=scipy.ndimage.gaussian_filter(powInLev,sigma=3.0)
+        powInLevRnd=np.sum(np.square(np.absolute(dataRndT.highpasses[iLev][:,:,:])),axis=2)/6.
+        powInLevRndSm=scipy.ndimage.gaussian_filter(powInLevRnd,sigma=3.0)
+        for iOri in range(6):
+            # If rotationally-varying wavelets are used, bear in mind power
+            # will vary due to DTCWT, not just from the image. This is OK
+            # because orientations aren't mixed in this approach.
+
+            # Fraction of power in each orientation, for original image
+#            mask=np.absolute(dataT.highpasses[iLev][:,:,iOri])<1.0e-4
+            powInOri=np.square(np.absolute(dataT.highpasses[iLev][:,:,iOri]))
+            powInOriSm=scipy.ndimage.gaussian_filter(powInOri,sigma=3.0)
+            dataFac=powInOriSm/powInLevSm
+
+            # Fraction of power in each orientation, for random image
+            powInOriRnd=np.square(np.absolute(dataRndT.highpasses[iLev][:,:,iOri]))
+            powInOriRndSm=scipy.ndimage.gaussian_filter(powInOriRnd,sigma=3.0)
+            dataRndFac=powInOriRndSm/powInLevRndSm
+
+            # Power conversion factor actual im -> rnd im
+            alpha=dataFac/dataRndFac
+            if iLev < nLevelsToBlend:
+                dataRndT.highpasses[iLev][:,:,iOri]*=alpha#np.sqrt(alpha)
+                dataRndT.highpasses[iLev][:,:,iOri]*=np.sqrt(np.sum(powInLev)/np.sum(powInLevRnd))
+            else:
+                dataRndT.highpasses[iLev][:,:,iOri]=dataT.highpasses[iLev][:,:,iOri]
 dataRndT.lowpass[:,:]=dataT.lowpass[:,:]
 
-# Invert the DTCWT.
+# Invert transform
 imageRec=transform.inverse(dataRndT)
+# Add back mean (still in log domain)
+imageRec+=np.log2(imageMean)
 
-# Display rain image and image with blended noise side-by-side.
+# Show random image and adjusted random image side-by-side
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 plt.subplot(1,2,1)
-plt.imshow(imageLn)
-plt.colorbar()
+im=plt.imshow(imageLn,vmin=-3.0)#,vmax=3.0)
+plt.xlabel("x-pixels")
+plt.ylabel("y-pixels")
+ax=plt.gca()
+divider = make_axes_locatable(ax)
+cax = divider.append_axes("right", size="5%", pad=0.05)
+cb=plt.colorbar(im,cax=cax)
+cb.set_label("$\\log_{2}(R)$")
 plt.subplot(1,2,2)
-plt.imshow(imageRec,vmin=np.min(imageLn),vmax=np.max(imageLn))
-plt.colorbar()
+im=plt.imshow(imageRec,vmin=-3.0,vmax=np.max(imageLn))#,vmax=3.0)
+plt.xlabel("x-pixels")
+plt.ylabel("y-pixels")
+ax=plt.gca()
+divider = make_axes_locatable(ax)
+cax = divider.append_axes("right", size="5%", pad=0.05)
+cb=plt.colorbar(im,cax=cax)
+cb.set_label("$\\log_{2}(R)$")
 plt.tight_layout()
 plt.show()
+np.savetxt(sys.argv[3],np.power(2.,imageRec))
 

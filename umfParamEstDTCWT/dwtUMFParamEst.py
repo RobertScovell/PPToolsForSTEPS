@@ -52,7 +52,6 @@ import dtcwt
 import pywt
 
 from fifGenLS2010 import eps2D
-#import legendreTransformation
 import fracInt
 
 def wlsZeros(noiseIn,thresh0,maxSc,minSc=1,H=0.,qmin=0.,qmax=8.,nq=81,decompmode='dtcwt',minZeroDist=10,mode='once',zeroMask=False):
@@ -79,10 +78,6 @@ def wlsZeros(noiseIn,thresh0,maxSc,minSc=1,H=0.,qmin=0.,qmax=8.,nq=81,decompmode
         dt=scipy.ndimage.morphology.distance_transform_edt(nzMask)
         # Only set to nan if distance is greater than minZeroDist from a non-zero
         noise[dt>minZeroDist]=np.nan
-#    noise[:,0]=np.nan
-#    noise[0,:]=np.nan
-#    noise[:,-1]=np.nan
-#    noise[-1,:]=np.nan
     
     ln2Scales=[]
     oriMax=[]
@@ -91,13 +86,11 @@ def wlsZeros(noiseIn,thresh0,maxSc,minSc=1,H=0.,qmin=0.,qmax=8.,nq=81,decompmode
         # Compute DTDWT 
         # Do not use rotationally-invariant transform. Adantage is much shorter filters. Disadvantage is that max mod over ori may not be meaningful?
         # Use length 10 'a' filters here, rather than the length 14 'b' (or length 18 'b_bp'). 
-#        transform = dtcwt.Transform2d(biort='near_sym_a', qshift='qshift_a')
+#        transform = dtcwt.Transform2d(biort='near_sym_b_bp', qshift='qshift_b_bp')
         transform = dtcwt.Transform2d(biort='near_sym_a', qshift='qshift_a')
         dataT = transform.forward(noise,nlevels=maxScale+1)
         for iLev in range(maxScale+1):
             hp=dataT.highpasses[iLev]
-    #        n=dataT.highpasses[iLev].shape[0]
-    #        hp=dataT.highpasses[iLev][int(n/4):int(-n/4),int(n/4):int(-n/4),:]
             ln2Scales.append(iLev+1) # first set of detail coeffs has scale=2
             with warnings.catch_warnings():
                 warnings.filterwarnings('ignore')
@@ -197,43 +190,12 @@ def dOfHCF(hvals,alpha,C1,H):
     dOfH=d-cOfDMinusAlpha
     return dOfH
 
-#def derivDOfHCF(hvals,alpha,C1,H):
-#    d=2.
-#    alphaP=1./(1.-1./alpha)
-#    # Compute codimension function ( gamma = d - alpha )
-#    gammavals=d-hvals+H
-#    return 1. * derivCOfGamma(alpha,C1,gammavals)
-
-#def dOfH(params,hvals,dvals,d=2.):
-#    alphaD=params[0]
-#    C1=params[1]
-#    H=params[2]
-#    alphaDP=1./(1.-1./alphaD)
-#    
-#    # Compute codimension function ( gamma = d - alpha )
-#    gammavals=d-hvals+H
-#    cOfDMinusAlpha=cOfGamma(alphaDP,C1,gammavals)
-##    cOfDMinusAlpha=C1*np.power((gammavals/(C1*alphaDP))+(1./alphaD),alphaDP)
-#
-#    # Transform to D(h) representation (but with h=d-gamma+H)
-#    dOfH=d-cOfDMinusAlpha
-#    return dOfH-dvals
-
 def umfModelFit(hfit,dfit,firstGuess):
     # use the spacing of hfit to determine fitting weights
     hfitdiffs=np.gradient(hfit[:,0])
     weights=np.abs(hfitdiffs[-1])/np.abs(hfitdiffs)
     weights=np.maximum.accumulate(weights)
-#    weights=np.sqrt(weights)
-#    weights=np.sqrt(weights)
-#    weights=np.linspace(0.1,1.0,num=hfitdiffs.shape[0],endpoint=True)
-#    weights=np.ones(hfitdiffs.shape)
-#    print(weights)
-#    plt.plot(weights)
-#    plt.show()
     popt,pcov=scipy.optimize.curve_fit(dOfHCF,hfit[:,0],dfit[:,0]+2.,firstGuess,sigma=weights,bounds=[[0.0,0.0,-np.inf],[2.0,1.0,np.inf]],max_nfev=100000,ftol=1.0e-10)
-#    popt,pcov=scipy.optimize.curve_fit(dOfHCF,hfit[:,0],dfit[:,0]+2.,firstGuess,bounds=[[0.0,0.0,-np.inf],[2.0,1.0,np.inf]])
-#    popt,pcov=scipy.optimize.curve_fit(dOfHCF,hfit[:,0],dfit[:,0]+2.,firstGuess,jac=derivDOfHCF,sigma=weights,bounds=[[0.0,0.0,-np.inf],[2.0,1.0,np.inf]])
     return popt,pcov
 
 if __name__ == '__main__':
@@ -284,7 +246,6 @@ if __name__ == '__main__':
 
     if debug == True:
         plt.plot(np.array(hfit[:,0]),dOfHCF(hfit[:,0],popt[0],popt[1],popt[2]))
-#        plt.plot(np.array(hfit[:,0]),dOfHCF(hfit[:,0],1.8,0.2,-2.))
         plt.scatter(np.array(hfit[:,0]),dfit[:,0]+2,marker='o',s=1.)
         plt.xlabel("Hölder Exponent h")
         plt.tight_layout()

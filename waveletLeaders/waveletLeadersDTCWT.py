@@ -69,7 +69,7 @@ nLevels = int(np.floor(max(np.log2(ny),np.log2(nx))))
 
 # Uncomment this to apply fractional integration before WaveletLeaders.
 # This might help to resolve singularity spectrum in some cases (possibly due to presence of negative Holder exponents).
-#noise=fracInt.fractionalIntegration(noise,-0.5)
+noise=fracInt.fractionalIntegration(noise,-1.0)
 
 # Do not use rotationally-invariant transform. Adantage is much shorter filters. Disadvantage is that maximum mod over orientations may not be meaningful?
 # Use length 10 'a' filters here, rather than the length 14 'b' (or length 18 'b_bp'). 
@@ -130,6 +130,17 @@ for iLev in range(nLevels):
         coeffsRescaled[iLev,iOri]=np.absolute(hp[xx.flatten(),yy.flatten(),iOri].reshape((int(nx/2),int(ny/2))))
         # Renormalize from L2 to L1-norm by multiplying by a factor of 1/sqrt(2) per level per dimension.
         coeffsRescaled[iLev,iOri]*=np.power(2.0,-1.0*float(iLev))
+
+#Wendt(2009) For scaling analysis, it is more suitable (cf. [12, 13]) to renormalize the standard L
+#2
+#-norm wavelet coefficients according
+#to a L
+#1
+#-norm: d
+#(m)
+#dX (j, k1, k2) = 2^(-jd/2) D(j,k1,k2)
+#(m)
+#X (j, k1, k2).
 
 # Convert ln2Scales to np.array
 ln2Scales=np.array(ln2Scales)

@@ -28,6 +28,9 @@ nLevelsT=int(np.ceil(np.log2(data1.shape[0])))
 dataT1 = transform.forward(imageLn1,nlevels=nLevelsT)
 dataT2 = transform.forward(imageLn2,nlevels=nLevelsT)
 
+wccs=[]
+lambds=[]
+
 for iSc in range(len(dataT1.highpasses)-1):
     hp1=dataT1.highpasses[iSc]
     hp2=dataT2.highpasses[iSc]
@@ -40,4 +43,9 @@ for iSc in range(len(dataT1.highpasses)-1):
     hp2Term=np.sum(np.square(np.absolute(hp2)))
     wcc=crossTerm/(np.sqrt(hp1Term*hp2Term))
     print(wcc)
+    wccs.append(wcc)
+    lambds.append(14*2**iSc)
+
+np.savetxt("out_dtcwt_wccs.txt",wccs,delimiter=",")
+np.savetxt("out_dtcwt_lambds.txt",lambds,delimiter=",")
 

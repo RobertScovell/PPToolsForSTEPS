@@ -47,11 +47,10 @@ def pyramid(image,nLevs):
     cA=image
     for iLvl in range(nLevs):
         cA,(cH,cV,cD)=pywt.dwt2(cA,'haar')
-        fac=1.#(2**iLvl)
-        outArr.append(np.absolute(fac*cA)/np.mean(fac*cA))
+        outArr.append(np.absolute(cA))
     return outArr
 
-def dtm(data,minScale=1,maxScale=10,etaMin=-2.,etaMax=1.,qVals=[1.5,2.0,2.5,3.0],debug=False):
+def dtm(data,minScale=1,maxScale=10,etaMin=-2.,etaMax=1.,qVals=[1.5,2.0,2.5,3.0],debug=False,pltTitle=None,pltShow=True,legendStr=None):
     # Determine the number of decomposition levels needed
     n0=data.shape[0]
     n1=data.shape[1]
@@ -63,9 +62,6 @@ def dtm(data,minScale=1,maxScale=10,etaMin=-2.,etaMax=1.,qVals=[1.5,2.0,2.5,3.0]
     D=2.
     nScales=maxScale-minScale+1
     
-#    # Flux at shortest scale considered
-#    epsLambda0=imPyramid[minScale]
-#    epsLambda0[epsLambda0<1.0e-16]=1.0e-16
     lambda0=np.power(2.,maxScale)/np.power(2.,minScale)
     
     etaVals=np.exp(np.linspace(etaMin,etaMax,num=31,endpoint=True))
@@ -96,16 +92,25 @@ def dtm(data,minScale=1,maxScale=10,etaMin=-2.,etaMax=1.,qVals=[1.5,2.0,2.5,3.0]
     umfParamEsts=[]
     for (iq,q) in enumerate(qVals):
         alphaC1Ests=[]
-        hw=10
+        hw=2
         for i in range(hw,len(etaVals)-hw):
             alphaC1Ests.append(np.polyfit(np.log(etaVals[i-hw:i+hw]),np.log(np.absolute(kQEta[iq,i-hw:i+hw])),1))
         iEst=np.argmax([x[0] for x in alphaC1Ests])
         alphaEst=alphaC1Ests[iEst][0]
         intercept=alphaC1Ests[iEst][1]
-        if debug == True:
-            plt.plot(np.log(etaVals),np.log(np.absolute(kQEta[iq,:])))
-            plt.plot(np.log(etaVals),alphaEst*np.log(etaVals)+intercept)
-            plt.show()
+        if debug == True and iq == 0:
+            if legendStr is not None:
+                plt.scatter(np.log(etaVals),np.log(np.absolute(kQEta[iq,:])),marker='^',color='k',s=10,label="%s data"%legendStr)
+                plt.plot(np.log(etaVals),alphaEst*np.log(etaVals)+intercept,color='k',ls='--',label="%s fit"%legendStr)
+            else:
+                plt.scatter(np.log(etaVals),np.log(np.absolute(kQEta[iq,:])),marker='^',color='k',s=10)
+                plt.plot(np.log(etaVals),alphaEst*np.log(etaVals)+intercept,color='k',ls='--')
+            plt.xlabel("$\log\; \left[\eta\\right]$")
+            plt.ylabel("$\log\; \left[K(q,\eta)\\right]$")
+            if pltTitle is not None:
+                plt.title(pltTitle)
+            if pltShow == True:
+                plt.show()
         kqEst=np.exp(intercept)
         fac=(np.power(q,alphaEst)-q)/(alphaEst-1)
         c1Est=kqEst/fac
@@ -130,7 +135,7 @@ if __name__ == '__main__':
     if len(sys.argv)>4:
         H=float(sys.argv[4])
         if np.abs(H) > 1.0e-3:
-            print("Fractional integration, order=",-H)
+            print("Fractional integration, order=",H)
             data=fracInt.fractionalIntegration(data,H)
     
     # Fractional integration can lead to negative fluxes

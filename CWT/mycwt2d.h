@@ -134,7 +134,6 @@ class myCWT2d {
   omp_lock_t writelock;
 
   void computeKernels() {
-
     kernels.resize(numScales);
     wDelta.resize(numScales);
     kernSqNorm.resize(numScales);
@@ -179,6 +178,8 @@ class myCWT2d {
             double omega2 = 2.0 * M_PI * f2 / 1.0;
             // Compute wavelet at omega1,omega2
             std::complex<double> kernEval = computePsiFThetaL(il,scales[im]*omega1,scales[im]*omega2);
+            // Complex conjugate
+            kernEval=std::conj(kernEval);
             kernelEvalTmp[i+nSteps/4][j+nSteps/4] = kernEval;
             // Compute 2-norm of kernel - this is not used in the dec / rec but in other apps. 
             kernSqNorm[im][il] += std::norm(kernEval);
@@ -367,7 +368,7 @@ class myCWT2d {
     // Get number of scales (deltaS is the number of voices per octave)
     int nSteps = image.shape()[0];
     voicesPerOctave = static_cast<int>( round( 1.0 / deltaS ) );
-    numScales = static_cast<int> ( ceil ( ( 1.0 / deltaS ) * log ( sLarge / sSmall ) / log ( 2.0 ) ) );
+    numScales = 1 + static_cast<int> ( ceil ( ( 1.0 / deltaS ) * log ( sLarge / sSmall ) / log ( 2.0 ) ) );
     std::cout << "myCWT2d: number of scales: " << numScales << std::endl;
 
     // Compute scales
@@ -456,8 +457,8 @@ class myCWT2d {
       // Integrate over positive frequencies
       for ( size_t i = 0 ; i < fftImage.shape()[0] / 2 ; i ++ ) {
         for ( size_t j = 0 ; j < fftImage.shape()[1] / 2; j ++ ) {
-          double ki = static_cast<double>(i);
-          double kj = static_cast<double>(j);
+          double ki = static_cast<double>(i) / fftImage.shape()[0];
+          double kj = static_cast<double>(j) / fftImage.shape()[1];
           double kr = sqrt(ki*ki+kj*kj);
           integral += kr * std::norm(kernels[im][0][fftImage.shape()[0]/2+i][fftImage.shape()[1]/2+j]) * 1.0;
           norm2 += std::norm(kernels[im][0][fftImage.shape()[0]/2+i][fftImage.shape()[1]/2+j]) * 1.0;
@@ -469,8 +470,8 @@ class myCWT2d {
       norm2 = 0.0;
       for ( size_t i = 0 ; i < fftImage.shape()[0] / 2 ; i ++ ) {
         for ( size_t j = 0 ; j < fftImage.shape()[1] / 2; j ++ ) {
-          double ki = static_cast<double>(i);
-          double kj = static_cast<double>(j);
+          double ki = static_cast<double>(i) / fftImage.shape()[0];
+          double kj = static_cast<double>(j) / fftImage.shape()[1];
           double kr = sqrt(ki*ki+kj*kj);
           integral += pow( kr - freqCentres[im] , 2.0 ) * std::norm(kernels[im][0][fftImage.shape()[0]/2+i][fftImage.shape()[1]/2+j]) * 1.0;
           norm2 += std::norm(kernels[im][0][fftImage.shape()[0]/2+i][fftImage.shape()[1]/2+j]) * 1.0;
@@ -492,16 +493,18 @@ class myCWT2d {
       norm2 = 0.0;
       for ( size_t i = 0 ; i < fftImage.shape()[0] ; i ++ ) {
         for ( size_t j = 0 ; j < fftImage.shape()[1] ; j ++ ) {
-          kernR[i][j] /= sqrt ( fftImage.shape()[0] * fftImage.shape()[1] );
           double ii = static_cast<double>(i);
           if ( ii > fftImage.shape()[0] / 2 ) ii = fftImage.shape()[0] - ii;
           double jj = static_cast<double>(j);
           if ( jj > fftImage.shape()[1] / 2 ) jj = fftImage.shape()[1] - jj;
+          ii/=fftImage.shape()[0];
+          jj/=fftImage.shape()[1];
           double iijj = sqrt(ii*ii+jj*jj); // distance from centre in real space
           integral += pow( iijj , 2.0 ) * std::norm(kernR[i][j]) * 1.0;
           norm2 += std::norm(kernR[i][j]) * 1.0;
         }
       }
+      std::cout << integral << "," << norm2 << std::endl;
       rWidthsSq[im] = integral / norm2;
     }
   }
@@ -657,7 +660,5 @@ class myCWT2d {
     (void)H5Sclose(space);
   }
 };
-
-
 
 #endif // __MYCWT2D_H_
