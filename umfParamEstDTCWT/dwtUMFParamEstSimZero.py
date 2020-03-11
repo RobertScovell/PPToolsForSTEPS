@@ -31,7 +31,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# Please quote the following paper, if using this code:
+# Please cite the following paper, if using this code:
 # Scovell, R. W. (2020) Applications of Directional Wavelets, Universal Multifractals and Anisotropic Scaling in Ensemble Nowcasting; A Review of Methods with Case Studies. Quarterly Journal of the Royal Meteorological Society. In Press. URL: http://dx.doi.org/abs/10.1002/qj.3780
 
 import numpy as np
@@ -41,7 +41,6 @@ import os
 
 from computeDOfH import wlsZeros,umfModelFit,dOfHCF
 
-print (os.path.dirname(__file__)+"../stochasticNoise")
 sys.path.insert(0,os.path.dirname(__file__)+"../stochasticNoise")
 from fifGenLS2010 import eps2D
 

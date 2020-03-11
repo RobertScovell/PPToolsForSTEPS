@@ -28,6 +28,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+# Please cite the following paper, if using this code:
+# Scovell, R. W. (2020) Applications of Directional Wavelets, Universal Multifractals and Anisotropic Scaling in Ensemble Nowcasting; A Review of Methods with Case Studies. Quarterly Journal of the Royal Meteorological Society. In Press. URL: http://dx.doi.org/abs/10.1002/qj.3780
+
 import numpy as np
 
 def fractionalIntegration(noise,H):
@@ -39,11 +42,6 @@ def fractionalIntegration(noise,H):
     ff[0,0]=1. # to give DC component factor of 1. 
     # Define factor for fractional integration
     fac=np.power(ff,-H)
-#    plt.imshow(np.log2(fac))
-#    plt.colorbar()
-#    plt.show()
-#    print(np.max(fac))
-#    print(np.min(fac))
     # Apply factor in freq space
     noiseFFT=np.fft.fft2(noise)
     noiseFFT*=fac

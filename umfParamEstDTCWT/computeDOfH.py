@@ -41,7 +41,7 @@ from scipy.optimize import least_squares
 import dtcwt
 import pywt
 
-# Please quote the following paper, if using this code:
+# Please cite the following paper, if using this code:
 # Scovell, R. W. (2020) Applications of Directional Wavelets, Universal Multifractals and Anisotropic Scaling in Ensemble Nowcasting; A Review of Methods with Case Studies. Quarterly Journal of the Royal Meteorological Society. In Press. URL: http://dx.doi.org/abs/10.1002/qj.3780
 
 def wlsZeros(noiseIn,thresh0,maxSc,minSc=1,qmin=0.,qmax=8.,nq=81,decompmode='dtcwt',minZeroDist=10,mode='once',zeroMask=False):

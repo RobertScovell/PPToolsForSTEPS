@@ -33,6 +33,10 @@
 
 # uses : DTDWT from https://pypi.python.org/pypi/dtcwt
 
+# Please cite the following paper, if using this code:
+# Scovell, R. W. (2020) Applications of Directional Wavelets, Universal Multifractals and Anisotropic Scaling in Ensemble Nowcasting; A Review of Methods with Case Studies. Quarterly Journal of the Royal Meteorological Society. In Press. URL: http://dx.doi.org/abs/10.1002/qj.3780
+
+
 import numpy as np
 import numpy.random
 import matplotlib as mpl

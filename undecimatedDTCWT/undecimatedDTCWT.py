@@ -32,7 +32,15 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 # uses : PyWavelets from https://pywavelets.readthedocs.io/en/latest/
-# uses : DTDWT from https://pypi.python.org/pypi/dtcwt ( for comparison to UD-DTCWT )
+# uses : DTCWT from https://pypi.python.org/pypi/dtcwt ( for comparison to UD-DTCWT )
+
+# Please cite the following paper, if using this code:
+# Scovell, R. W. (2020) Applications of Directional Wavelets, Universal Multifractals and Anisotropic Scaling in Ensemble Nowcasting; A Review of Methods with Case Studies. Quarterly Journal of the Royal Meteorological Society. In Press. URL: http://dx.doi.org/abs/10.1002/qj.3780
+
+# This is a fairly naive implementation of the Undecimated DTCWT, using Pywavelets to compute the single-tree SWT transforms and DTCWT to provide the Q-shift filters.
+# Better methods may be available, e.g. based on:
+# Hill, P. R., N. Anantrasirichai, A. Achim, M. E. Al-Mualla, and D. R. Bull. “Undecimated Dual-Tree Complex Wavelet Transforms.” Signal Processing: Image Communication 35 (2015): 61-70.
+# The following site links to Matlab code: https://vilab.blogs.bristol.ac.uk/?p=1156
 
 import numpy as np
 import matplotlib as mpl
