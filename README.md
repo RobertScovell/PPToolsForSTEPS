@@ -1,7 +1,19 @@
 This repository contains various bits of code in C++ and Python that were used to derive the results (images / statistics) for the following paper:
+
 Scovell, R. W. (2020) Applications of Directional Wavelets, Universal Multifractals and Anisotropic Scaling in Ensemble Nowcasting; A Review of Methods with Case Studies. Quarterly Journal of the Royal Meteorological Society. In Press. URL: http://dx.doi.org/abs/10.1002/qj.3780
+
 Please cite this paper if you use the code in your project.
 
+The C++ CWT code, described below relies on the C++ FFTW3, BOOST and HDF5 libraries.
+
+All of the Python3 scripts require the Numpy library.
+
+They may also require one or more of the following:
+
+scipy
+matplotlib
+Pywavelets ( https://pywavelets.readthedocs.io/en/latest/ )
+dtcwt ( https://pypi.org/project/dtcwt/ )
 
 /CWT
 ===
