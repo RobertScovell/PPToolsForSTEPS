@@ -4,15 +4,18 @@ Scovell, R. W. (2020) Applications of Directional Wavelets, Universal Multifract
 
 Please cite this paper if you use the code in your project.
 
-The C++ CWT code, described below relies on the C++ FFTW3, BOOST and HDF5 libraries.
+The C++ CWT code, described below, relies on the C++ FFTW3, BOOST and HDF5 libraries.
 
 All of the Python3 scripts require the Numpy library.
 
 They may also require one or more of the following:
 
 scipy
+
 matplotlib
+
 Pywavelets ( https://pywavelets.readthedocs.io/en/latest/ )
+
 dtcwt ( https://pypi.org/project/dtcwt/ )
 
 /CWT
@@ -75,7 +78,7 @@ Usage is:
 ```bash
     python3 dtcwtApplyTestPatternAnisotropy.py "isotropic-realisation"
 ```
-The other script (dtcwtNoiseBlend.py) does scale-selective blending of a prior image with a supplied isotropic realisation. The realisation is adjusted to match the anisotropy in the prior before blending. The default setting is to use the realisation at all scales but this can be adjusted in the code.
+The other script (dtcwtNoiseBlend.py) does scale-selective blending of a prior image with a supplied isotropic realisation. The realisation is adjusted to match the anisotropy in the prior before blending. The default setting is to output the realisation at all scales but this can be adjusted (so that the prior is used at larger scales) in the code.
 
 Usage is:
 ```bash
