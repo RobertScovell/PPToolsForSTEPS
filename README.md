@@ -89,7 +89,11 @@ Depending on the mean value (compared to the realization, which should be mu=1) 
 The Python3 script dwtUMFParamEst.py takes a CSV file and estimates the UMF parameters using the structure function approach, as described in Scovell (2020).
 
 Usage is:
-python3 dwtUMFParamEst.py "csv file" "detection threshold", where the detection threshold is the minimum data value above zero. For fields containing negative values, the modulus can be used first.
+
+```bash
+python3 dwtUMFParamEst.py "csv file" "detection threshold"
+```
+where the detection threshold is the minimum data value above zero. For fields containing negative values, the modulus can be used first.
 For CSV files containing zeros, it is better to simulate small singularities (that would otherwise be seen below the detection threshold), to replace the actual zeros, otherwise the zeros introduce artificial regularity in the field. This script aims to do that, using the FIF realization generator above. This is based on the approach of Gires, A., Tchiguirinskaia, I., Schertzer, D. and Lovejoy, S., 2012. Influence of the zero-rainfall on the assessment of the multifractal parameters. Advances in water resources, 45, pp.13-25.
 
 The usage is the same as above.
