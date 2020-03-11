@@ -46,7 +46,7 @@ dtmCompare.py is similar to dtm.py except that it can compute DTM for two images
 
 /filterDisplayDTCWT
 ==================
-This folder contains a Python3 script to display the real, imaginary and absolute values of the two-dimensional complex-oriented DTCWT filters, for each orientation, at a given level of decomposition (level 5 used by default). The script requires no commend-line arguments.
+This folder contains a Python3 script to display the real, imaginary and absolute values of the two-dimensional complex-oriented DTCWT filters, for each orientation, at a given level of decomposition (level 5 used by default). The script requires no command-line arguments.
 
 /imageAnalysisDTCWT
 ==================
@@ -76,6 +76,13 @@ Usage is:
     python3 dtcwtApplyTestPatternAnisotropy.py "isotropic-realisation"
 ```
 The other script (dtcwtNoiseBlend.py) does scale-selective blending of a prior image with a supplied isotropic realisation. The realisation is adjusted to match the anisotropy in the prior before blending. The default setting is to use the realisation at all scales but this can be adjusted in the code.
+
+Usage is:
+```bash
+    python3 dtcwtNoiseBlend.py "csv-of-prior" "csv-of-noise" "csv-output"
+```
+
+Depending on the mean value (compared to the realization, which should be mu=1) and the rain fraction in the input image, the power on each scale level might need to be adjusted. There is a switch "usePowerAdj" in the script that can be used to achieve this. Further work is needed to refine this method.
 
 /umfParamEstDTCWT
 ================
