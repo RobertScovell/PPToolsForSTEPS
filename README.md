@@ -18,15 +18,15 @@ This folder contains two CSV files of case data (as in Scovell(2020)) that can b
 This folder contains the Python3 scripts dtm.py and dtmCompare.py. The dtm.py script ingests a two-dimensional CSV file and computes the alpha,C1 multifractal parameters using the Double Trace Moment technique: Lavallée, D. (1991) Multifractal analysis and simulation techniques and turbulent fields. McGill University, Montreal.
 The usage is:
 ```bash
-    python3 dtm.py "csv file"
+    python3 dtm.py "csv-file"
 ```
 to compute using default values for eta range [-2,1].
 ```bash
-    python3 dtm.py "csv file" "eta min" "eta max"
+    python3 dtm.py "csv-file" "eta-min" "eta-max"
 ```
 to compute using user specified eta range.
 ```bash
-    python3 dtm.py "csv file" "eta min" "eta max" "H"
+    python3 dtm.py "csv-file" "eta-min" "eta-max" "H"
 ```
 to compute using user specified eta range and apply fractional integration order H to image prior to DTM. This hasn't been properly tested.
 dtmCompare.py is similar to dtm.py except that it can compute DTM for two images and plot them side-by-side.
@@ -52,11 +52,11 @@ The command-line arguments are documented in the scripts.
 ======================
 This contains a script to extract the global anisotropic scaling properties of a prior image and to apply them to an isotropic realisation (dtcwtApplyGlobalAnisotropyOfImage.py). Usage is:
 ```bash
-    python3 dtcwtApplyGlobalAnisotropyOfImage.py "csv of prior image" "synthetic noise"
+    python3 dtcwtApplyGlobalAnisotropyOfImage.py "csv-of-prior" "csv-of-noise"
 ```
 Also there is a script to demonstrate applying anisotropy using a test pattern (dtcwtApplyTestPatternAnisotropy.py). Usage is:
 ```bash
-    python3 dtcwtApplyTestPatternAnisotropy.py "isotropic realisation"
+    python3 dtcwtApplyTestPatternAnisotropy.py "isotropic-realisation"
 ```
 The other script (dtcwtNoiseBlend.py) does scale-selective blending of a prior image with a supplied isotropic realisation. The realisation is adjusted to match the anisotropy in the prior before blending. The default setting is to use the realisation at all scales but this can be adjusted in the code.
 
@@ -71,7 +71,7 @@ For CSV files containing zeros, it is better to simulate small singularities (th
 This is a fairly naive implementation of the Undecimated DTCWT, using Pywavelets to compute the single-tree SWT transforms and DTCWT to provide the Q-shift filters. Better methods may be available, e.g. based on: Hill, P. R., N. Anantrasirichai, A. Achim, M. E. Al-Mualla, and D. R. Bull. “Undecimated Dual-Tree Complex Wavelet Transforms.” Signal Processing: Image Communication 35 (2015): 61-70. The following site links to Matlab code: https://vilab.blogs.bristol.ac.uk/?p=1156
 Usage is:
 ```bash
-    python3 undecimatedDTCWT.py "csv file"
+    python3 undecimatedDTCWT.py "csv-file"
 ```
 
 /waveletLeaders
@@ -79,9 +79,9 @@ Usage is:
 This contains a naive implementation of the Wavelet Leaders method, based on Wendt, H., Roux, S.G., Jaffard, S. and Abry, P., 2009. Wavelet leaders and bootstrap for multifractal analysis of images. Signal Processing, 89(6), pp.1100-1114.
  Usage is:
 ```bash
-    python3 waveletLeadersDTCWT.py "csv file" "threshold as fraction of coefficient range"
+    python3 waveletLeadersDTCWT.py "csv-file" "threshold"
 ```
-There are some obsolete scripts to compute ensemble-averaged wavelet leaders spectra and the script above can be run in a batch mode, requiring more arguments, to support this.
+Here the threshold is a fraction of the range of wavelet coefficients on each scale level. There are some obsolete scripts to compute ensemble-averaged wavelet leaders spectra and the script above can be run in a batch mode, requiring more arguments, to support this.
 
 /autocorrelation_comparison
 ==========================
