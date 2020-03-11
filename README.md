@@ -16,6 +16,7 @@ This folder contains two CSV files of case data (as in Scovell(2020)) that can b
 /doubleTraceMoment
 =================
 This folder contains the Python3 scripts dtm.py and dtmCompare.py. The dtm.py script ingests a two-dimensional CSV file and computes the alpha,C1 multifractal parameters using the Double Trace Moment technique: Lavallée, D. (1991) Multifractal analysis and simulation techniques and turbulent fields. McGill University, Montreal.
+
 The usage is:
 ```bash
     python3 dtm.py "csv-file"
@@ -50,11 +51,15 @@ The command-line arguments are documented in the scripts.
 
 /synthMatchedNoiseDTCWT
 ======================
-This contains a script to extract the global anisotropic scaling properties of a prior image and to apply them to an isotropic realisation (dtcwtApplyGlobalAnisotropyOfImage.py). Usage is:
+This contains a script to extract the global anisotropic scaling properties of a prior image and to apply them to an isotropic realisation (dtcwtApplyGlobalAnisotropyOfImage.py).
+
+Usage is:
 ```bash
     python3 dtcwtApplyGlobalAnisotropyOfImage.py "csv-of-prior" "csv-of-noise"
 ```
-Also there is a script to demonstrate applying anisotropy using a test pattern (dtcwtApplyTestPatternAnisotropy.py). Usage is:
+Also there is a script to demonstrate applying anisotropy using a test pattern (dtcwtApplyTestPatternAnisotropy.py).
+
+Usage is:
 ```bash
     python3 dtcwtApplyTestPatternAnisotropy.py "isotropic-realisation"
 ```
@@ -62,13 +67,18 @@ The other script (dtcwtNoiseBlend.py) does scale-selective blending of a prior i
 
 /umfParamEstDTCWT
 ================
-The Python3 script dwtUMFParamEst.py takes a CSV file and estimates the UMF parameters using the structure function approach, as described in Scovell (2020). Usage is:
+The Python3 script dwtUMFParamEst.py takes a CSV file and estimates the UMF parameters using the structure function approach, as described in Scovell (2020).
+
+Usage is:
 python3 dwtUMFParamEst.py "csv file" "detection threshold", where the detection threshold is the minimum data value above zero. For fields containing negative values, the modulus can be used first.
-For CSV files containing zeros, it is better to simulate small singularities (that would otherwise be seen below the detection threshold), to replace the actual zeros, otherwise the zeros introduce artificial regularity in the field. This script aims to do that, using the FIF realization generator above. This is based on the approach of Gires, A., Tchiguirinskaia, I., Schertzer, D. and Lovejoy, S., 2012. Influence of the zero-rainfall on the assessment of the multifractal parameters. Advances in water resources, 45, pp.13-25. The usage is the same as above.
+For CSV files containing zeros, it is better to simulate small singularities (that would otherwise be seen below the detection threshold), to replace the actual zeros, otherwise the zeros introduce artificial regularity in the field. This script aims to do that, using the FIF realization generator above. This is based on the approach of Gires, A., Tchiguirinskaia, I., Schertzer, D. and Lovejoy, S., 2012. Influence of the zero-rainfall on the assessment of the multifractal parameters. Advances in water resources, 45, pp.13-25.
+
+The usage is the same as above.
 
 /undecimatedDTCWT
 ================
 This is a fairly naive implementation of the Undecimated DTCWT, using Pywavelets to compute the single-tree SWT transforms and DTCWT to provide the Q-shift filters. Better methods may be available, e.g. based on: Hill, P. R., N. Anantrasirichai, A. Achim, M. E. Al-Mualla, and D. R. Bull. “Undecimated Dual-Tree Complex Wavelet Transforms.” Signal Processing: Image Communication 35 (2015): 61-70. The following site links to Matlab code: https://vilab.blogs.bristol.ac.uk/?p=1156
+
 Usage is:
 ```bash
     python3 undecimatedDTCWT.py "csv-file"
@@ -77,7 +87,8 @@ Usage is:
 /waveletLeaders
 ==============
 This contains a naive implementation of the Wavelet Leaders method, based on Wendt, H., Roux, S.G., Jaffard, S. and Abry, P., 2009. Wavelet leaders and bootstrap for multifractal analysis of images. Signal Processing, 89(6), pp.1100-1114.
- Usage is:
+
+Usage is:
 ```bash
     python3 waveletLeadersDTCWT.py "csv-file" "threshold"
 ```
