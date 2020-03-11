@@ -18,10 +18,17 @@ This folder contains two CSV files of case data (as in Scovell(2020)) that can b
 This folder contains the Python3 scripts dtm.py and dtmCompare.py. The dtm.py script ingests a two-dimensional CSV file and computes the alpha,C1 multifractal parameters using the Double Trace Moment technique: Lavallée, D. (1991) Multifractal analysis and simulation techniques and turbulent fields. McGill University, Montreal.
 The usage is:
 ```bash
-    python3 dtm.py "csv file" ( to compute using default values for eta range [-2,1] ).
-    python3 dtm.py "csv file" "eta min" "eta max" ( to compute using user specified eta range)
-    python3 dtm.py "csv file" "eta min" "eta max" "J" ( to compute using user specified eta range and apply fractional integration order H to image prior to DTM. This hasn't been properly tested.)
+    python3 dtm.py "csv file"
 ```
+to compute using default values for eta range [-2,1].
+```bash
+    python3 dtm.py "csv file" "eta min" "eta max"
+```
+to compute using user specified eta range.
+```bash
+    python3 dtm.py "csv file" "eta min" "eta max" "H"
+```
+to compute using user specified eta range and apply fractional integration order H to image prior to DTM. This hasn't been properly tested.
 dtmCompare.py is similar to dtm.py except that it can compute DTM for two images and plot them side-by-side.
 
 /filterDisplayDTCWT
