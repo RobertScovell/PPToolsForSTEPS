@@ -81,7 +81,7 @@ This contains a naive implementation of the Wavelet Leaders method, based on Wen
 ```bash
     python3 waveletLeadersDTCWT.py "csv-file" "threshold"
 ```
-Here the threshold is a fraction of the range of wavelet coefficients on each scale level. There are some obsolete scripts to compute ensemble-averaged wavelet leaders spectra and the script above can be run in a batch mode, requiring more arguments, to support this.
+Here the threshold is a fraction of the range of wavelet coefficients on each scale level (to exclude from the sums). There are some obsolete scripts to compute ensemble-averaged wavelet leaders spectra and the script above can be run in a batch mode, requiring more arguments, to support this.
 
 /autocorrelation_comparison
 ==========================
