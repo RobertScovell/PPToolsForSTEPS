@@ -31,16 +31,19 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# uses : DTDWT from https://pypi.python.org/pypi/dtcwt
+# uses : PyWavelets from https://pywavelets.readthedocs.io/en/latest/
+
+# Please cite the following paper, if using this code:
+# Scovell, R. W. (2020) Applications of Directional Wavelets, Universal Multifractals and Anisotropic Scaling in Ensemble Nowcasting; A Review of Methods with Case Studies. Quarterly Journal of the Royal Meteorological Society. In Press. URL: http://dx.doi.org/abs/10.1002/qj.3780
 
 import numpy as np
-import matplotlib as mpl
-mpl.rcParams['image.interpolation']='nearest'
-mpl.rcParams['font.size'] = 14
 import matplotlib.pyplot as plt
 import sys
-import pywt
+
+sys.path.insert(0,os.path.dirname(__file__)+"../stochasticNoise")
 import fracInt
+
+import pywt
 
 def pyramid(image,nLevs):
     outArr=[]

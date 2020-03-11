@@ -33,6 +33,9 @@
 
 # uses : DTDWT from https://pypi.python.org/pypi/dtcwt
 
+# Please cite the following paper, if using this code:
+# Scovell, R. W. (2020) Applications of Directional Wavelets, Universal Multifractals and Anisotropic Scaling in Ensemble Nowcasting; A Review of Methods with Case Studies. Quarterly Journal of the Royal Meteorological Society. In Press. URL: http://dx.doi.org/abs/10.1002/qj.3780
+
 import sys
 import os
 import numpy as np
@@ -46,6 +49,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import dtcwt
 
 image=np.genfromtxt(sys.argv[1],delimiter=",")
+image[np.abs(image)<1.0e-10]=1.0e-10
 
 # compute DTDWT 
 ny=image.shape[0]

@@ -31,7 +31,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# uses : DTDWT from https://pypi.python.org/pypi/dtcwt
+# uses : DTCWT from https://pypi.python.org/pypi/dtcwt
+
+# Please cite the following paper, if using this code:
+# Scovell, R. W. (2020) Applications of Directional Wavelets, Universal Multifractals and Anisotropic Scaling in Ensemble Nowcasting; A Review of Methods with Case Studies. Quarterly Journal of the Royal Meteorological Society. In Press. URL: http://dx.doi.org/abs/10.1002/qj.3780
+
+# This is a basic implementation of the Wavelet Leaders method. For more information, the following paper is recommended: Wendt, H., Roux, S.G., Jaffard, S. and Abry, P., 2009. Wavelet leaders and bootstrap for multifractal analysis of images. Signal Processing, 89(6), pp.1100-1114. 
+# For better results, the following software is provided by Wendt et al., here: https://www.irit.fr/~Herwig.Wendt/software.html
 
 import h5py
 import numpy as np
@@ -47,7 +53,10 @@ import scipy.ndimage
 
 import dtcwt
 
+
 import legendreTransformation
+
+sys.path.insert(0,os.path.dirname(__file__)+"../stochasticNoise")
 import fracInt
 
 batchFlag=os.getenv("BATCHMODE")

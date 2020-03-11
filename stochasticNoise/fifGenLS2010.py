@@ -1,3 +1,57 @@
+#!/usr/bin/env python3
+# encoding: utf-8
+
+# -----------------------------------------------------------------------------
+# (C) British Crown Copyright 2017-2019 Met Office.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# * Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+#
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+#
+# * Neither the name of the copyright holder nor the names of its
+#   contributors may be used to endorse or promote products derived from
+#   this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+# This code is a basic generator of 2D realisations of the Fractionally Integrated Flux model.
+# Parameters are:
+# 1. Number of rows in image (not tested with unequal number of rows x columns )
+# 2. Number of columns in image
+# 3. Multifractality parameter ( alpha = 2.0 => lognormal cascade, alpha = 1.0 => Cauchy (not tested) ). Typically alpha = [1.5,1.8] for rain.
+# 4. Codimension of the mean (see Lovejoy and Schertzer, 2013). This is the sparseness of the mean value. C1=0 => homogeneous.
+# 5. Hurst parameter ( H=0.0 -> 1.0 ) used for fractional integration. Typically H=0.33 is reasonable for rain.
+# 6. Output CSV file.
+
+# This code is a generator of 2D realisations of the Fractionally Integrated Flux model.
+# It is a direct port from the Matlab code provided by Schertzer and Lovejoy, available here: http://www.physics.mcgill.ca/~gang/software/index.html
+# An extra step to do the fractional integration has been added at the end.
+
+# Parameters are:
+# 1. Number of rows in image (not tested with unequal number of rows x columns )
+# 2. Number of columns in image
+# 3. Multifractality parameter ( alpha = 2.0 => lognormal cascade, alpha = 1.0 => Cauchy (not tested) ). Typically alpha = [1.2,1.6] for rain.
+# 4. Codimension of the mean (see Lovejoy and Schertzer, 2013). This is the sparseness of the mean value. C1=0 => homogeneous. A value of 0.1-0.2 is typical for rain.
+# 5. Hurst parameter ( H=0.0 -> 1.0 ) used for fractional integration. H=0.33 is reasonable for rain.
+# 6. Output CSV file.
+
 import numpy as np
 import sys
 import numpy.fft

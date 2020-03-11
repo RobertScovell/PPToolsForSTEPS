@@ -33,20 +33,19 @@
 
 # uses : DTDWT from https://pypi.python.org/pypi/dtcwt
 
+# Please cite the following paper, if using this code:
+# Scovell, R. W. (2020) Applications of Directional Wavelets, Universal Multifractals and Anisotropic Scaling in Ensemble Nowcasting; A Review of Methods with Case Studies. Quarterly Journal of the Royal Meteorological Society. In Press. URL: http://dx.doi.org/abs/10.1002/qj.3780
+
+
 import numpy as np
-import matplotlib as mpl
-mpl.rcParams['image.interpolation']='nearest'
-mpl.rcParams['font.size'] = 14
 import matplotlib.pyplot as plt
-import matplotlib.colors
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 import sys
 import scipy.ndimage
 from scipy.signal import convolve2d
 
-from fifGenLS2010 import eps2D
 from dtm import dtm
 
+sys.path.insert(0,os.path.dirname(__file__)+"../stochasticNoise")
 import fracInt
 
 def pyramid2(image,iDyadicScaleLevs):

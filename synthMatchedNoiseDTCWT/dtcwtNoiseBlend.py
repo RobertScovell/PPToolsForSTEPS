@@ -33,6 +33,10 @@
 
 # uses : DTDWT from https://pypi.python.org/pypi/dtcwt
 
+# Please cite the following paper, if using this code:
+# Scovell, R. W. (2020) Applications of Directional Wavelets, Universal Multifractals and Anisotropic Scaling in Ensemble Nowcasting; A Review of Methods with Case Studies. Quarterly Journal of the Royal Meteorological Society. In Press. URL: http://dx.doi.org/abs/10.1002/qj.3780
+
+
 import numpy as np
 import numpy.random
 import matplotlib as mpl
@@ -47,7 +51,8 @@ import matplotlib.cm as cm
 import matplotlib.colors as clr
 import dtcwt
 
-nLevelsToBlend=4
+nLevelsToBlend=10
+usePowerAdj=True
 
 # Load rain image from CSV file and convert to log-R.
 image=np.genfromtxt(sys.argv[1],delimiter=",")
@@ -140,7 +145,8 @@ for iLev in range(nLevels):
             alpha=dataFac/dataRndFac
             if iLev < nLevelsToBlend:
                 dataRndT.highpasses[iLev][:,:,iOri]*=alpha#np.sqrt(alpha)
-                dataRndT.highpasses[iLev][:,:,iOri]*=np.sqrt(np.sum(powInLev)/np.sum(powInLevRnd))
+                if usePowerAdj==True:
+                    dataRndT.highpasses[iLev][:,:,iOri]*=np.sqrt(np.sum(powInLev)/np.sum(powInLevRnd))
             else:
                 dataRndT.highpasses[iLev][:,:,iOri]=dataT.highpasses[iLev][:,:,iOri]
 dataRndT.lowpass[:,:]=dataT.lowpass[:,:]
