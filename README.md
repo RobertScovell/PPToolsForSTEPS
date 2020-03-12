@@ -53,7 +53,7 @@ This folder contains a Python3 script to display the real, imaginary and absolut
 
 /imageAnalysisDTCWT
 ==================
-This folder contains a Python3 script to analyse both the global and the local anisotropy in a given image. It displays the fraction of power in each sub-band/scale and also the local orientation for a range of scales. It uses just the CSV image as the input.
+This folder contains a Python3 script to analyse both the global and the local anisotropic scaling, using the DTCWT, for a given image. It displays the fraction of power in each sub-band/scale and also the local orientation for a range of scales. It uses just the CSV image as the input.
 
 /stochasticNoise
 ===============
