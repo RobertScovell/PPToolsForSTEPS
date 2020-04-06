@@ -82,6 +82,7 @@ if __name__ == '__main__':
 
         hfit,dfit=wlsZeros(noisePlusZeroField,thresh0,maxSc,qmin=0.0,qmax=6.0,decompmode='dtcwt',nq=81,minZeroDist=1,mode='once',zeroMask=False)
         popt,pcov=umfModelFit(hfit,dfit,nextGuess)
+        nextGuess=popt
         print(popt)
         if debug == True:
             plt.plot(np.array(hfit[:,0]),dOfHCF(hfit[:,0],popt[0],popt[1],popt[2]))
